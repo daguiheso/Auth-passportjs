@@ -78,9 +78,18 @@ app.get('/logout', (req, res) => {
   res.redirect('/login')
 })
 
-app.get('/welcome', (req, res) => {
+app.get('/welcome', ensureAuth, (req, res) => {
   /* otra de passportjs es que el usuario autenticado lo va aguardar siempre en la propiedad user del request, este user lo obtiene de lo deserializado*/
   res.send(`You are welcome ${req.user.username}`)
 })
+
+function ensureAuth (req, res, next) {
+  /* utilizamos metodo isAuthenticated() de passport en req*/
+  if (req.isAuthenticated()) {
+    return next()
+  }
+
+  res.redirect('/login')
+}
 
 server.listen(port, () => console.log(`Listening on port ${port}`))
