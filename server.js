@@ -44,4 +44,19 @@ passport.use(new LocalStrategy((username, password, done) => {
   done(null, false, { message: 'Unknown user'})
 }))
 
+/* Lo que yo serialize en serializeUser es lo que me pasan a deserializeUser y en deserilizeUser lo obtengo de la db
+  y lo devuelbo al objeto de serializacion
+*/
+
+/* Serializar usuario - recibe un callback donde tengo el objeto de usuario*/
+passport.serializeUser((user, done) => {
+  done(null, user) /* si el objeto de usuario es muy grande le podemos mandar solo un dato como user.username o user.id*/
+})
+
+/* Deserializar usuario - con solo ese datico que me pasan (example:id del user) ir y hacer toda la logica de consulta*/
+passport.deserializeUser((user, done) => {
+  // Obtener el usuario por id, en este caso como recibo solo user lo obtengo por user de la db y lo devuelbo al objeto de serializacion
+  done(null, user)
+})
+
 server.listen(port, () => console.log(`Listening on port ${port}`))
