@@ -1,7 +1,7 @@
 const http = require('http')
 const path = require('path')
 const express = require('express')
-const cookieParse = require('cookie-parser') /* parsear cookies*/
+const cookieParser = require('cookie-parser') /* parsear cookies*/
 const bodyParser = require('body-parser') /* parsear body de http request*/
 const expressSession = require('express-session') /* maneja las sesiones para persistir a users registrado*/
 const passport = require('passport')
@@ -14,7 +14,7 @@ const server = http.createServer(app)
 /* configurando middlewares*/
 app.use(bodyParser.json()) /* parsear bodys que puedan llegar en json*/
 app.use(bodyParser.urlencoded({ extended: false })) /* parsear bodys que puedan llegar encodeados en la url como forms*/
-app.use(cookieParse()) /* parsear cookies que llegan a la app*/
+app.use(cookieParser()) /* parsear cookies que llegan a la app*/
 app.use(expressSession({
   secret: 'my secret are mine', /* sessiones trabajan con una llave secreta para encriptar la sesion*/
   resave: false,
@@ -67,5 +67,20 @@ app.post('/login', passport.authenticate('local', {
   successRedirect: '/welcome', /* a donde se redirecciona cuando es exitoso el login*/
   failureRedirect: '/login' /* a donde se redirecciona cuando es erroneo el login*/
 }))
+
+app.get('/login', (req, res) => {
+  res.redirect('/login.html')
+})
+
+app.get('/logout', (req, res) => {
+  /* Lo otro que tiene passportjs es que en dentro del objeto req en el middleware el agrega una function logout()*/
+  req.logout() /* se encarga de limpiar la sesion*/
+  res.redirect('/login')
+})
+
+app.get('/welcome', (req, res) => {
+  /* otra de passportjs es que el usuario autenticado lo va aguardar siempre en la propiedad user del request, este user lo obtiene de lo deserializado*/
+  res.send(`You are welcome ${req.user.username}`)
+})
 
 server.listen(port, () => console.log(`Listening on port ${port}`))
