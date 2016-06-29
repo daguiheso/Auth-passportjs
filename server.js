@@ -31,6 +31,35 @@ app.use(express.static(path.join(__dirname, 'public')))
 passport.serializeUser((user, done) => done(null, user))
 passport.deserializeUser((user, done) => done(null, user))
 
+/* configurando estratega de twitter*/
+
+/* TwitterStrategy es una clase que recibe ya en vez de una function, primero unas propiedades
+   consumerKey - lo pasamos como parametro de ejecucion de la variable de entorno, las var de 
+   entorno las utilizamos para no quemar esta informacion tan sensible dentro del codigo, es 
+   informacion que puede cambiar entonces son datos privados de mi app, callbackURL que 
+*/
+passport.use(new TwitterStrategy({
+  consumerKey: process.env.TWITTER_CONSUMER_KEY,
+  consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+  callbackURL: 'http://dude-where-is-my-auth.jotason.rocks/auth/twitter/callback'
+}, (token, tokenSecret, profile, done) => {
+  // Logica de registro y verificacion de usuario
+  done(null, profile)
+}))
+
+/* twitter pide 2 rutas*/
+
+// Lanza lla autenticacion
+app.get('/auth/twitter', passport.authenticate('twitter'))
+
+/* Callback - como twiter utiliza estrategia tipo oauth, yo me autentico el me redirecciona a twitter, verifica y 
+   twitter me envia una informacion al callback que tiene mi app
+*/
+app.get('/auth/twitter/callback', passport.authenticate('twitter', {
+  successRedirect: '/welcome',
+  failureRedirect: '/'
+}))
+
 app.get('/logout', (req, res) => {
   /* Lo otro que tiene passportjs es que en dentro del objeto req en el middleware el agrega una function logout()*/
   req.logout() /* se encarga de limpiar la sesion*/
