@@ -59,4 +59,13 @@ passport.deserializeUser((user, done) => {
   done(null, user)
 })
 
+/* set rute para login, y como mmiddleware le pasamos passport.authenticate y la estrategia utilizada que puede tener
+   parametros de config, no le definimos nada mas a la ruta porque ya passport.authenticate va a llamar la logica que esta
+   definida en la estrategia
+*/
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/welcome', /* a donde se redirecciona cuando es exitoso el login*/
+  failureRedirect: '/login' /* a donde se redirecciona cuando es erroneo el login*/
+}))
+
 server.listen(port, () => console.log(`Listening on port ${port}`))
